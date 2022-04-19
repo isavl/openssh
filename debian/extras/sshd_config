@@ -1,0 +1,147 @@
+###############################################################################
+# This is the sshd server system-wide configuration file.
+# See sshd_config(5) for more information.
+###############################################################################
+
+###############################################################################
+# General settings.
+###############################################################################
+
+PidFile /run/ssh/sshd.pid
+
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+
+ModuliFile /etc/ssh/moduli
+
+AddressFamily any
+
+#ListenAddress
+
+Port 22
+
+Protocol 2
+
+Compression no
+
+AcceptEnv LANG LANGUAGE LC_*
+
+#AllowAgentForwarding no
+
+#AllowStreamLocalForwarding no
+
+#AllowTcpForwarding no
+
+Subsystem sftp internal-sftp
+
+LogLevel INFO
+
+#PermitOpen none
+
+#PermitTunnel no
+
+#PermitUserRC no
+
+PrintMotd no
+PrintLastLog yes
+
+TCPKeepAlive yes
+
+UseDNS no
+
+X11Forwarding no
+
+###############################################################################
+# Authentication settings.
+###############################################################################
+
+#AuthenticationMethods publickey
+
+CASignatureAlgorithms ssh-ed25519,sk-ssh-ed25519@openssh.com
+
+HostbasedAcceptedAlgorithms ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,sk-ssh-ed25519@openssh.com
+
+HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,sk-ssh-ed25519@openssh.com
+
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org
+
+PubkeyAcceptedAlgorithms ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,sk-ssh-ed25519@openssh.com
+
+Ciphers chacha20-poly1305@openssh.com
+
+MACs umac-128-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+
+FingerprintHash sha256
+
+ExposeAuthInfo no
+
+HostbasedAuthentication no
+
+PermitRootLogin yes
+
+StrictModes yes
+
+LoginGraceTime 2m
+
+MaxAuthTries 12
+
+MaxSessions 32
+
+IgnoreUserKnownHosts yes
+
+IgnoreRhosts yes
+
+###############################################################################
+# Authentication settings (password).
+###############################################################################
+
+ChallengeResponseAuthentication no
+
+KbdInteractiveAuthentication no
+
+PasswordAuthentication yes
+
+PermitEmptyPasswords no
+
+UsePAM yes
+
+###############################################################################
+# Authentication settings (publickey).
+###############################################################################
+
+PubkeyAuthentication yes
+
+AuthorizedKeysFile .ssh/authorized_keys
+
+###############################################################################
+# Authentication settings (kerberos).
+###############################################################################
+
+KerberosAuthentication no
+
+KerberosOrLocalPasswd yes
+
+KerberosTicketCleanup yes
+
+###############################################################################
+# Authentication settings (gssapi).
+###############################################################################
+
+GSSAPIAuthentication no
+
+GSSAPICleanupCredentials yes
+
+GSSAPIStrictAcceptorCheck yes
+
+###############################################################################
+# Hosts settings.
+###############################################################################
+
+###############################################################################
+# Groups settings.
+###############################################################################
+
+###############################################################################
+# Users settings.
+###############################################################################
+

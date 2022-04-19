@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+umask 022
+
+if [ "$1" = "configure" ]; then
+    if ! getent passwd sshd >/dev/null; then
+        adduser --quiet --system --no-create-home --home /run/ssh --shell /usr/sbin/nologin sshd
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

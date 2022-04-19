@@ -1,0 +1,39 @@
+#!/bin/sh
+###############################################################################
+# Script for generation ssh server host keys.
+###############################################################################
+
+set -o errexit
+
+# Path to directory for config files.
+SSH_CONFIG_DIR="/etc/ssh"
+
+# Path to ssh-keygen bin.
+SSH_KEYGEN_BIN="/usr/bin/ssh-keygen"
+
+if [ ! -d "${SSH_CONFIG_DIR}" ]; then
+    echo "Directory ${SSH_CONFIG_DIR} do not exist."
+    exit 1
+fi
+
+if [ ! -x "${SSH_KEYGEN_BIN}" ]; then
+    echo "Could not find the 'ssh-keygen' executable."
+    exit 1
+fi
+
+for key_type in ed25519 rsa; do
+    # Remove old key.
+    rm -f "${SSH_CONFIG_DIR}/ssh_host_${key_type}_key" "${SSH_CONFIG_DIR}/ssh_host_${key_type}_key.pub"
+
+    "${SSH_KEYGEN_BIN}" -q -N "" -C "ssh_host_${key_type}_key" -t "${key_type}" -b 4096 \
+        -f "${SSH_CONFIG_DIR}/ssh_host_${key_type}_key"
+
+    if [ "${?}" -ne 0 ]; then
+        echo "Failed to generate ${key_type} key."
+        exit 1
+    fi
+
+    # Sanitize permissions. Just little paranoia.
+    chmod 600 "${SSH_CONFIG_DIR}/ssh_host_${key_type}_key"
+    chmod 644 "${SSH_CONFIG_DIR}/ssh_host_${key_type}_key.pub"
+done

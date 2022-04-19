@@ -1,0 +1,16 @@
+[Unit]
+
+Description=OpenSSH server key generation
+
+ConditionFileNotEmpty=|!/etc/ssh/ssh_host_ed25519_key
+ConditionFileNotEmpty=|!/etc/ssh/ssh_host_ed25519_key.pub
+ConditionFileNotEmpty=|!/etc/ssh/ssh_host_rsa_key
+ConditionFileNotEmpty=|!/etc/ssh/ssh_host_rsa_key.pub
+
+[Service]
+
+ExecStart=/usr/sbin/sshd-keygen
+
+Type=oneshot
+
+RemainAfterExit=yes

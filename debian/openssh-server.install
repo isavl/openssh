@@ -1,0 +1,14 @@
+usr/sbin/sshd
+
+usr/share/man/man5/moduli.5
+usr/share/man/man5/sshd_config.5
+usr/share/man/man8/sshd.8
+
+debian/extras/moduli etc/ssh
+
+debian/extras/sshd_config etc/ssh
+
+debian/extras/sshd-keygen usr/sbin
+
+debian/extras/systemd/sshd-keygen.service lib/systemd/system
+debian/extras/systemd/sshd.service lib/systemd/system

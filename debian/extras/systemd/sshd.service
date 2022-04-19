@@ -1,0 +1,30 @@
+[Unit]
+
+Description=OpenSSH server
+
+Documentation=man:sshd(8)
+Documentation=man:sshd_config(5)
+
+After=network.target
+After=sshd-keygen.service
+
+Wants=sshd-keygen.service
+
+[Service]
+
+ExecStartPre=/usr/sbin/sshd -t -f /etc/ssh/sshd_config
+ExecStart=/usr/sbin/sshd -D -f /etc/ssh/sshd_config
+ExecReload=/usr/sbin/sshd -t -f /etc/ssh/sshd_config
+ExecReload=/bin/kill -HUP $MAINPID
+
+Type=notify
+
+KillMode=process
+
+Restart=on-failure
+RestartSec=10s
+RestartPreventExitStatus=255
+
+[Install]
+
+WantedBy=multi-user.target
