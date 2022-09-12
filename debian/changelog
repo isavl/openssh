@@ -1,3 +1,9 @@
+openssh (1:9.0p1-1+deb11) bullseye; urgency=medium
+
+  * Rebuild 1:9.0p1-1 for bullseye
+
+ -- Igor Savlook <isav@alzari.pw>  Tue, 13 Sep 2022 01:04:43 +0300
+
 openssh (1:9.0p1-1) unstable; urgency=medium
 
   * Upstream release 9.0p1
