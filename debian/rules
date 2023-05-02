@@ -1,19 +1,18 @@
 #!/usr/bin/make -f
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
-export DEB_BUILD_MAINT_OPTIONS := hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
 
 include /usr/share/dpkg/default.mk
 
-ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
 RUN_TESTS := yes
 else
 RUN_TESTS :=
 endif
 
-ifeq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+ifeq ($(filter parallel=%,$(DEB_BUILD_OPTIONS)),)
 PARALLEL :=
 else
 PARALLEL := -j$(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -31,93 +30,55 @@ endif
 DEFAULT_PATH := /usr/local/bin:/usr/bin:/bin
 SUPERUSER_PATH := /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Common path configuration.
+# Default paths.
 CONFFLAGS += --sysconfdir=/etc/ssh
 CONFFLAGS += --libexecdir=\$${prefix}/lib/openssh
+CONFFLAGS += --with-default-path=$(DEFAULT_PATH) --with-superuser-path=$(SUPERUSER_PATH)
+
+# Compiler flags.
+CONFFLAGS += --with-cflags='$(CPPFLAGS) $(CFLAGS)'
+
+# Linker flags.
+CONFFLAGS += --with-ldflags='$(strip -Wl,--as-needed $(LDFLAGS))'
 
 # Common build options.
 CONFFLAGS += --disable-strip
 CONFFLAGS += --with-4in6
-CONFFLAGS += --with-mantype=doc
-CONFFLAGS += --with-pid-dir=/run/ssh
-CONFFLAGS += --with-privsep-path=/run/ssh/privsep
-
-# The Hurd needs libcrypt for res_query et al.
-ifeq ($(DEB_HOST_ARCH_OS),hurd)
-CONFFLAGS += --with-libs=-lcrypt
-endif
-
-# Everything above here is common to the deb and udeb builds.
-CONFFLAGS_UDEB := $(CONFFLAGS)
-
-# Options specific to the deb build.
+CONFFLAGS += --with-audit=linux
 CONFFLAGS += --with-kerberos5=/usr
 CONFFLAGS += --with-libedit
+CONFFLAGS += --with-mantype=doc
 CONFFLAGS += --with-pam
-CONFFLAGS += --with-ssl-engine
-ifeq ($(DEB_HOST_ARCH_OS),linux)
-CONFFLAGS += --with-audit=linux
+CONFFLAGS += --with-pid-dir=/run/ssh
+CONFFLAGS += --with-privsep-path=/run/ssh/privsep
 CONFFLAGS += --with-security-key-builtin
 CONFFLAGS += --with-selinux
+CONFFLAGS += --with-ssl-engine
 CONFFLAGS += --with-systemd
-endif
-
-# The deb build wants xauth; the udeb build doesn't.
 CONFFLAGS += --with-xauth=/usr/bin/xauth
-CONFFLAGS_UDEB += --without-xauth
-
-# Default paths.
-CONFFLAGS += --with-default-path=$(DEFAULT_PATH) --with-superuser-path=$(SUPERUSER_PATH)
-CONFFLAGS_UDEB += --with-default-path=/usr/local/bin:/usr/bin:/bin --with-superuser-path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-# Compiler flags.
-cflags := $(CPPFLAGS) $(CFLAGS)
-cflags_udeb := -Os
-CONFFLAGS += --with-cflags='$(cflags)'
-CONFFLAGS_UDEB += --with-cflags='$(cflags_udeb)'
-
-# Linker flags.
-CONFFLAGS += --with-ldflags='$(strip -Wl,--as-needed $(LDFLAGS))'
-CONFFLAGS_UDEB += --with-ldflags='-Wl,--as-needed'
 
 %:
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure -B debian/build-deb -- $(CONFFLAGS)
-
-ifeq ($(filter noudeb,$(DEB_BUILD_PROFILES)),)
-	dh_auto_configure -B debian/build-udeb -- $(CONFFLAGS_UDEB)
-	# Avoid libnsl linkage. Ugh.
-	perl -pi -e 's/ +-lnsl//' debian/build-udeb/config.status
-	cd debian/build-udeb && ./config.status
-endif
+	dh_auto_configure -- $(CONFFLAGS)
 
 override_dh_auto_build:
-	$(MAKE) -C debian/build-deb $(PARALLEL) ASKPASS_PROGRAM='/usr/bin/ssh-askpass'
-	$(MAKE) -C debian/build-deb regress-prep
-	$(MAKE) -C debian/build-deb $(PARALLEL) regress-binaries regress-unit-binaries
-
-ifeq ($(filter noudeb,$(DEB_BUILD_PROFILES)),)
-	$(MAKE) -C debian/build-udeb $(PARALLEL) ASKPASS_PROGRAM='/usr/bin/ssh-askpass' ssh scp sftp sshd ssh-keygen
-endif
+	$(MAKE) $(PARALLEL) ASKPASS_PROGRAM='/usr/bin/ssh-askpass'
+	$(MAKE) regress-prep
+	$(MAKE) $(PARALLEL) regress-binaries regress-unit-binaries
 
 override_dh_auto_test:
 ifeq ($(RUN_TESTS),yes)
-	$(MAKE) -C debian/build-deb unit compat-tests
+	$(MAKE) unit compat-tests
 	$(MAKE) -C debian/extras/tests/keygen
 endif
 
 override_dh_auto_install:
-	$(MAKE) -C debian/build-deb DESTDIR=$$(pwd)/debian/tmp install-nosysconf
+	$(MAKE) DESTDIR=$$(pwd)/debian/tmp install-nosysconf
 
 override_dh_install:
-	dh_install -N openssh-client-udeb -N openssh-server-udeb
-
-ifeq ($(filter noudeb,$(DEB_BUILD_PROFILES)),)
-	dh_install -p openssh-client-udeb -p openssh-server-udeb \
-		--sourcedir=debian/build-udeb
-endif
+	dh_install
 
 	# This can't be done using dh_link, because it's needed earlier by
 	# dh_installalternatives.
