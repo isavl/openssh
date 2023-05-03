@@ -1,3 +1,16 @@
+openssh (1:9.3p1-1+deb11) bullseye; urgency=medium
+
+  * Rebuild 1:9.3p1-1 for bullseye
+
+ -- Igor Savlook <isav@alzari.pw>  Wed, 03 May 2023 03:15:02 +0300
+
+openssh (1:9.3p1-1) unstable; urgency=medium
+
+  * Upstream release 9.3p1
+  * Removed udeb packages
+
+ -- Igor Savlook <isav@alzari.pw>  Tue, 02 May 2023 15:43:38 +0300
+
 openssh (1:9.0p1-1+deb11) bullseye; urgency=medium
 
   * Rebuild 1:9.0p1-1 for bullseye

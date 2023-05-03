@@ -2,38 +2,42 @@ Source: openssh
 Maintainer: Igor Savlook <isav@alzari.pw>
 Section: net
 Priority: standard
-Build-Depends: debhelper (>= 13.1~),
-               debhelper-compat (= 13),
-               dpkg-dev (>= 1.16.1~),
-               libaudit-dev [linux-any],
-               libedit-dev,
-               libfido2-dev (>= 1.5.0) [linux-any],
-               libkrb5-dev | heimdal-dev,
-               libpam0g-dev | libpam-dev,
-               libselinux1-dev [linux-any],
-               libssl-dev (>= 1.1.0g),
-               libsystemd-dev [linux-any] | libelogind-dev [linux-any],
-               pkg-config,
-               zlib1g-dev (>= 1:1.2.3)
-Standards-Version: 4.5.1
+Build-Depends:
+    debhelper (>= 13.1~),
+    debhelper-compat (= 13),
+    dpkg-dev (>= 1.16.1~),
+    libaudit-dev [linux-any],
+    libedit-dev,
+    libfido2-dev (>= 1.5.0) [linux-any],
+    libkrb5-dev | heimdal-dev,
+    libpam0g-dev | libpam-dev,
+    libselinux1-dev [linux-any],
+    libssl-dev (>= 1.1.0g),
+    libsystemd-dev [linux-any] | libelogind-dev [linux-any],
+    pkg-config,
+    zlib1g-dev,
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
-Homepage: http://www.openssh.com/
 
 Package: openssh-client
 Architecture: any
 Multi-Arch: foreign
-Depends: ${misc:Depends},
-         ${shlibs:Depends},
-         adduser (>= 3.10),
-         dpkg (>= 1.7.0),
-         passwd
-Conflicts: sftp
-Breaks: openssh-sk-helper
-Replaces: openssh-sk-helper,
-          ssh,
-          ssh-krb5
-Provides: rsh-client,
-          ssh-client
+Depends:
+    ${misc:Depends},
+    ${shlibs:Depends},
+    adduser,
+    passwd,
+Conflicts:
+    sftp,
+Breaks:
+    openssh-sk-helper,
+Replaces:
+    openssh-sk-helper,
+    ssh,
+    ssh-krb5,
+Provides:
+    rsh-client,
+    ssh-client,
 Description: Secure Shell (SSH) client, for secure access to remote machines
  This is the portable version of OpenSSH, a free implementation of
  the Secure Shell protocol as specified by the IETF secsh working
@@ -61,25 +65,28 @@ Package: openssh-server
 Priority: optional
 Architecture: any
 Multi-Arch: foreign
-Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends},
-         ${shlibs:Depends},
-         adduser (>= 3.9),
-         dpkg (>= 1.9.0),
-         libpam-modules (>= 0.72-9),
-         libpam-runtime (>= 0.76-14),
-         lsb-base (>= 4.1+Debian3),
-         openssh-client (= ${binary:Version}),
-         openssh-sftp-server,
-         procps,
-         ucf (>= 0.28)
-Conflicts: sftp,
-           ssh-socks,
-           ssh2
-Replaces: openssh-client (<< 1:7.9p1-8),
-          ssh,
-          ssh-krb5
-Provides: ssh-server
+Pre-Depends:
+    ${misc:Pre-Depends}
+Depends:
+    ${misc:Depends},
+    ${shlibs:Depends},
+    adduser,
+    libpam-modules,
+    libpam-runtime,
+    openssh-client (= ${binary:Version}),
+    openssh-sftp-server,
+    procps,
+    ucf,
+Conflicts:
+    sftp,
+    ssh-socks,
+    ssh2,
+Replaces:
+    openssh-client (<< 1:7.9p1-8),
+    ssh,
+    ssh-krb5,
+Provides:
+    ssh-server,
 Description: Secure Shell (SSH) server, for secure access from remote machines
  This is the portable version of OpenSSH, a free implementation of
  the Secure Shell protocol as specified by the IETF secsh working
@@ -105,12 +112,16 @@ Package: openssh-sftp-server
 Priority: optional
 Architecture: any
 Multi-Arch: foreign
-Depends: ${misc:Depends},
-         ${shlibs:Depends}
-Breaks: openssh-server (<< 1:6.5p1-5)
-Replaces: openssh-server (<< 1:6.5p1-5)
-Enhances: openssh-server,
-          ssh-server
+Depends:
+    ${misc:Depends},
+    ${shlibs:Depends},
+Breaks:
+    openssh-server (<< 1:6.5p1-5),
+Replaces:
+    openssh-server (<< 1:6.5p1-5),
+Enhances:
+    openssh-server,
+    ssh-server,
 Description: Secure Shell (SSH) sftp server module, for SFTP access from remote machines
  This is the portable version of OpenSSH, a free implementation of
  the Secure Shell protocol as specified by the IETF secsh working
@@ -135,32 +146,3 @@ Description: Secure Shell (SSH) sftp server module, for SFTP access from remote 
  .
  Newer versions of the draft will not be supported, though some features
  are individually implemented as extensions.
-
-Package: openssh-client-udeb
-Section: debian-installer
-Priority: optional
-Package-Type: udeb
-Architecture: any
-Depends: ${shlibs:Depends}
-Build-Profiles: <!noudeb>
-XB-Installer-Menu-Item: 99999
-Description: Secure Shell client for the Debian installer
- This is the portable version of OpenSSH, a free implementation of
- the Secure Shell protocol as specified by the IETF secsh working group.
- .
- This package provides the ssh client for use in debian-installer.
-
-Package: openssh-server-udeb
-Section: debian-installer
-Priority: optional
-Package-Type: udeb
-Architecture: any
-Depends: ${shlibs:Depends}
-Build-Profiles: <!noudeb>
-Description: Secure Shell server for the Debian installer
- This is the portable version of OpenSSH, a free implementation of
- the Secure Shell protocol as specified by the IETF secsh working group.
- .
- This package provides the sshd server for use in debian-installer.
- Since it is expected to be used in specialized situations (e.g. S/390
- installs with no console), it does not provide any configuration.
